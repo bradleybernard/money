@@ -20,6 +20,7 @@ use function max;
 use function str_pad;
 use function strlen;
 use function substr;
+use function array_key_first;
 
 use const FILTER_VALIDATE_INT;
 use const PHP_ROUND_HALF_DOWN;
@@ -328,7 +329,8 @@ final class Money implements JsonSerializable
         }, $ratios);
 
         while (self::$calculator::compare($remainder, '0') > 0) {
-            $index           = $fractions !== [] ? array_keys($fractions, max($fractions))[0] : 0;
+            // Allocate from left to right (beginning to end) for ratios to add extra
+            $index           = array_key_first($fractions);
             $results[$index] = new self(self::$calculator::add($results[$index]->amount, '1'), $results[$index]->currency);
             $remainder       = self::$calculator::subtract($remainder, '1');
             unset($fractions[$index]);
